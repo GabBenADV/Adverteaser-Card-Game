@@ -6,11 +6,11 @@ export const GRID = {
 };
 
 export const CARD = {
-  size: [1.3, 1, 0.06],
+  size: [2.5, 2, 0.02],
 };
 
 export const FOCUS = {
-  z: 3,
+  z: 4,
   scale: 1.25,
   moveDuration: 0.45,
   flipDuration: 0.55,
@@ -21,4 +21,10 @@ export const DIM = {
   z: -0.25,
   scale: 0.95,
   duration: 0.25,
+};
+
+export const TEXTURES = {
+  dir: "cards",
+  ext: "webp",
+  count: 32,
 };

@@ -1,43 +1,58 @@
 import { useMemo, useRef } from "react";
-import { CARD, DIM, FOCUS } from "../../config/card.config.js";
-import { useCardAnimation, hoverIn, hoverOut } from "../../hooks/useCardAnimation.js";
+import { CARD, DIM } from "../../config/card.config.js";
+import { useCardAnimation, hoverOut } from "../../hooks/useCardAnimation.js";
+import { useCardTextures } from "../../hooks/useCardTextures.js";
 
-export default function Card({ position, index, selectedIndex, setSelectedIndex }) {
+export default function Card({ index, scatterPos, scatterRot, layout, selectedIndex, setSelectedIndex }) {
     const ref = useRef();
 
     const isActive = selectedIndex === index;
     const isAnyActive = selectedIndex !== null;
     const isDimmed = isAnyActive && !isActive;
+    const { frontMap, backMap } = useCardTextures(index);
 
-    const home = useMemo(
-        () => ({ x: position[0], y: position[1], z: position[2] ?? 0 }),
-        [position]
-    );
+    const stackPos = useMemo(() => {
+        const z = +0.002 * index;
+        const x = 0.01 * index - 0.1;
+        return [x, 0, z];
+    }, [index]);
 
-    useCardAnimation({ ref, home, isActive, isDimmed });
+    const stackRot = useMemo(() => [0, 0, 0], []);
 
-    const onClick = () => {
+    const home = useMemo(() => {
+        const p = layout === "stack" ? stackPos : scatterPos;
+        const r = layout === "stack" ? stackRot : scatterRot;
+        return { x: p[0], y: p[1], z: p[2] ?? 0, rotX: r[0], rotY: r[1], rotZ: r[2] };
+    }, [layout, stackPos, scatterPos, stackRot, scatterRot]);
+
+    const initialPos = useRef(null);
+    if (!initialPos.current) {
+        initialPos.current = [home.x, home.y, home.z];
+    }
+
+    const initialRot = useRef(null);
+    if (!initialRot.current) initialRot.current = [home.rotX, home.rotY, home.rotZ];
+
+    useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive });
+
+    const onPointerDown = (e) => {
+        const first = e.intersections?.[0];
+        if (!first) return;
+
+        if (first.eventObject !== e.eventObject) return;
+
+        e.stopPropagation();
+
         if (isAnyActive && !isActive) return;
         setSelectedIndex((cur) => (cur === index ? null : index));
-    };
-
-    const onOver = () => {
-        if (isAnyActive) return;     // prima era: if (isAnyActive && !isActive) return;
-        hoverIn(ref, 0.15);
-    };
-
-    const onOut = () => {
-        if (isAnyActive) return;
-        hoverOut(ref, home.z);
     };
 
     return (
         <mesh
             ref={ref}
-            position={[home.x, home.y, home.z]}
-            onClick={onClick}
-            onPointerOver={onOver}
-            onPointerOut={onOut}
+            position={initialPos.current}
+            rotation={initialRot.current}
+            onPointerDown={onPointerDown}
         >
             <boxGeometry args={CARD.size} />
 
@@ -47,6 +62,7 @@ export default function Card({ position, index, selectedIndex, setSelectedIndex 
                     attach={`material-${i}`}
                     metalness={0}
                     roughness={1}
+                    map={(i === 4) ? frontMap : (i === 5) ? backMap : null}
                     transparent={isDimmed}
                     opacity={isDimmed ? DIM.opacity : 1}
                     depthWrite={!isDimmed}

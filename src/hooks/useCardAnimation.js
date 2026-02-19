@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { DIM, FOCUS } from "../config/card.config.js";
+import { DIM, FOCUS, TEXTURES } from "../config/card.config.js";
 
 export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive }) {
   // Focus + flip
@@ -18,12 +18,14 @@ export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive })
         { x: FOCUS.scale, y: FOCUS.scale, z: FOCUS.scale, duration: FOCUS.moveDuration },
         0
       );
+      tl.to(m.rotation, { z: 0, duration: FOCUS.moveDuration }, 0);
       tl.to(m.rotation, { y: Math.PI, duration: FOCUS.flipDuration }, 0.05);
+      tl.to(m.position, { x: -1.5, duration: 1, ease: "power2.in" }, `>${FOCUS.moveDuration - 0.5}`);
     } else {
       const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
-      tl.to(m.position, { x: home.x, y: home.y, z: home.z, duration: FOCUS.moveDuration }, 0);
+      tl.to(m.position, { x: home.x, y: home.y, z: home.z + 0.002 * TEXTURES.count, duration: 1.5 }, 0);
       tl.to(m.scale, { x: 1, y: 1, z: 1, duration: FOCUS.moveDuration }, 0);
-      tl.to(m.rotation, { y: 0, duration: FOCUS.moveDuration }, 0);
+      tl.to(m.rotation, { y: 0, z: home.rotZ, duration: FOCUS.moveDuration }, 0);
     }
   }, [ref, home, isActive]);
 
