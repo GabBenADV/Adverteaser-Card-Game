@@ -29,6 +29,22 @@ export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.2
     }
   }
 
+  async function submitForm(e) {
+    e.preventDefault();
+    try {
+      await fetch("/api/leads.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formRef.current.querySelector("#email").value,
+          category: formRef.current.querySelector("#category").value,
+        }),
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  }
+
   useEffect(() => {
     if (open) setMounted(true);
   }, [open]);
@@ -95,7 +111,7 @@ export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.2
       <div ref={formRef} style={{ position: "absolute", opacity: 0, visibility: "hidden", zIndex: -1, borderRadius: 16, top: 0, left: 0, width: "100%", height: "100%",
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"
        }} >
-        <form action="">
+        <form action="" onSubmit={(e) => { submitForm(e); }} >
           <div style={{ fontSize: CARD.solutionFontSize, lineHeight: 1.1, color: 'white', textAlign: 'center', fontWeight: 700, marginBottom: 20 }}>Lasciaci il tuo contatto</div>
           <input type="hidden" name="category" id="category" value={item.category} />
           <input style={{ border: 'white', borderRadius: 20, width: '100%', padding: '8px 12px', fontSize: 20}} type="email" name="email" id="email" placeholder="Email" />
