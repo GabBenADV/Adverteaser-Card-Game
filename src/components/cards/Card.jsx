@@ -1,73 +1,110 @@
-import { useMemo, useRef } from "react";
-import { CARD, DIM } from "../../config/card.config.js";
-import { useCardAnimation, hoverOut } from "../../hooks/useCardAnimation.js";
+import { useEffect, useMemo, useRef } from "react";
+import { CARD, DIM, FOCUS } from "../../config/card.config.js";
+import { useCardAnimation, hoverIn, hoverOut } from "../../hooks/useCardAnimation.js";
 import { useCardTextures } from "../../hooks/useCardTextures.js";
 
-export default function Card({ index, scatterPos, scatterRot, layout, selectedIndex, setSelectedIndex }) {
-    const ref = useRef();
+export default function Card({
+  index,
+  scatterPos,
+  angleZ,
+  layout,
+  selectedIndex,
+  setSelectedIndex,
+  canInteract = true,
+  setActiveObject,
+}) {
+  const ref = useRef();
 
-    const isActive = selectedIndex === index;
-    const isAnyActive = selectedIndex !== null;
-    const isDimmed = isAnyActive && !isActive;
-    const { frontMap, backMap } = useCardTextures(index);
+  const isActive = selectedIndex === index;
+  const isAnyActive = selectedIndex !== null;
+  const isDimmed = isAnyActive && !isActive;
 
-    const stackPos = useMemo(() => {
-        const z = +0.002 * index;
-        const x = 0.01 * index - 0.1;
-        return [x, 0, z];
-    }, [index]);
+  const { frontMap, backMap } = useCardTextures(index);
 
-    const stackRot = useMemo(() => [0, 0, 0], []);
+  // stack: piccolo “mucchio” con spessore
+  const stackPos = useMemo(() => {
+    const z = +0.002 * index;
+    const x = 0.01 * index - 0.1;
+    return [x, 0, z];
+  }, [index]);
 
-    const home = useMemo(() => {
-        const p = layout === "stack" ? stackPos : scatterPos;
-        const r = layout === "stack" ? stackRot : scatterRot;
-        return { x: p[0], y: p[1], z: p[2] ?? 0, rotX: r[0], rotY: r[1], rotZ: r[2] };
-    }, [layout, stackPos, scatterPos, stackRot, scatterRot]);
-
-    const initialPos = useRef(null);
-    if (!initialPos.current) {
-        initialPos.current = [home.x, home.y, home.z];
-    }
-
-    const initialRot = useRef(null);
-    if (!initialRot.current) initialRot.current = [home.rotX, home.rotY, home.rotZ];
-
-    useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive });
-
-    const onPointerDown = (e) => {
-        const first = e.intersections?.[0];
-        if (!first) return;
-
-        if (first.eventObject !== e.eventObject) return;
-
-        e.stopPropagation();
-
-        if (isAnyActive && !isActive) return;
-        setSelectedIndex((cur) => (cur === index ? null : index));
+  // home “dinamica” in base al layout + rotZ (angolazione 2D)
+  const home = useMemo(() => {
+    const p = layout === "stack" ? stackPos : scatterPos;
+    return {
+      x: p[0],
+      y: p[1],
+      z: p[2] ?? 0,
+      rotZ: layout === "scatter" ? angleZ : 0,
     };
+  }, [layout, stackPos, scatterPos, angleZ]);
 
-    return (
-        <mesh
-            ref={ref}
-            position={initialPos.current}
-            rotation={initialRot.current}
-            onPointerDown={onPointerDown}
-        >
-            <boxGeometry args={CARD.size} />
+  // posizione/rotazione iniziale fissate (React non deve teletrasportare ad ogni render)
+  const initialPos = useRef(null);
+  if (!initialPos.current) initialPos.current = [home.x, home.y, home.z];
 
-            {Array.from({ length: 6 }).map((_, i) => (
-                <meshStandardMaterial
-                    key={i}
-                    attach={`material-${i}`}
-                    metalness={0}
-                    roughness={1}
-                    map={(i === 4) ? frontMap : (i === 5) ? backMap : null}
-                    transparent={isDimmed}
-                    opacity={isDimmed ? DIM.opacity : 1}
-                    depthWrite={!isDimmed}
-                />
-            ))}
-        </mesh>
-    );
+  const initialRot = useRef(null);
+  if (!initialRot.current) initialRot.current = [0, 0, home.rotZ ?? 0];
+
+  useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive });
+
+  // opzionale: esponi l’oggetto attivo (se ti serve per panel esterno)
+  useEffect(() => {
+    if (!setActiveObject) return;
+    if (isActive) setActiveObject(ref.current);
+    else if (!isAnyActive) setActiveObject(null);
+  }, [isActive, isAnyActive, setActiveObject]);
+
+  const onPointerDown = (e) => {
+    if (!canInteract) return;
+
+    // reagisce SOLO il primo hit (quello davanti)
+    if (e.intersections?.[0]?.eventObject !== e.eventObject) return;
+
+    e.stopPropagation();
+
+    if (isAnyActive && !isActive) return;
+    setSelectedIndex((cur) => (cur === index ? null : index));
+  };
+
+  const onOver = () => {
+    if (!canInteract) return;
+    if (isAnyActive && !isActive) return;
+
+    // hover leggero, ma non “rompe” il focus
+    hoverIn(ref, isActive ? FOCUS.z + 0.15 : home.z + 0.15);
+  };
+
+  const onOut = () => {
+    if (!canInteract) return;
+    if (isAnyActive && !isActive) return;
+
+    hoverOut(ref, isActive ? FOCUS.z : home.z);
+  };
+
+  return (
+    <mesh
+      ref={ref}
+      position={initialPos.current}
+      rotation={initialRot.current}
+      onPointerDown={onPointerDown}
+      castShadow
+      receiveShadow
+    >
+      <boxGeometry args={CARD.size} />
+
+      {Array.from({ length: 6 }).map((_, i) => (
+        <meshStandardMaterial
+          key={i}
+          attach={`material-${i}`}
+          metalness={0}
+          roughness={1}
+          map={i === 4 ? frontMap : i === 5 ? backMap : null}
+          transparent={isDimmed}
+          opacity={isDimmed ? DIM.opacity : 1}
+          depthWrite={!isDimmed}
+        />
+      ))}
+    </mesh>
+  );
 }

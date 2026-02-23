@@ -3,29 +3,60 @@ import gsap from "gsap";
 import { DIM, FOCUS, TEXTURES } from "../config/card.config.js";
 
 export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive }) {
-  // Focus + flip
+  // Focus + flip (+ shift laterale in delay)
   useEffect(() => {
     const m = ref.current;
     if (!m) return;
+
+    const width = window.innerWidth;
 
     gsap.killTweensOf([m.position, m.rotation, m.scale]);
 
     if (isActive) {
       const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
+
+      // focus al centro
       tl.to(m.position, { x: 0, y: 0, z: FOCUS.z, duration: FOCUS.moveDuration }, 0);
+
+      // zoom
       tl.to(
         m.scale,
         { x: FOCUS.scale, y: FOCUS.scale, z: FOCUS.scale, duration: FOCUS.moveDuration },
         0
       );
+
+      // raddrizza angolazione (Z=0) e flippa (Y=PI)
       tl.to(m.rotation, { z: 0, duration: FOCUS.moveDuration }, 0);
       tl.to(m.rotation, { y: Math.PI, duration: FOCUS.flipDuration }, 0.05);
-      tl.to(m.position, { x: -1.5, duration: 1, ease: "power2.in" }, `>${FOCUS.moveDuration - 0.5}`);
+
+      // shift “a sinistra / in alto” dopo un attimo (tu lo volevi in delay)
+      const shiftAt = Math.max(0, FOCUS.moveDuration - 0.1);
+      tl.to(
+        m.position,
+        {
+          x: width < 1024 ? 0 : -1.8,
+          y: width < 1024 ? 1.2 : 0,
+          duration: 0.5,
+          ease: "power2.in",
+        },
+        shiftAt
+      );
     } else {
       const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
-      tl.to(m.position, { x: home.x, y: home.y, z: home.z + 0.002 * TEXTURES.count, duration: 1.5 }, 0);
+
+      // torna alla home (posizione + profondità)
+      // NB: qui mantengo il tuo offset z “spessore mazzo”
+      tl.to(
+        m.position,
+        { x: home.x, y: home.y, z: home.z + 0.002 * TEXTURES.count, duration: 1.5 },
+        0
+      );
+
+      // torna a scala normale
       tl.to(m.scale, { x: 1, y: 1, z: 1, duration: FOCUS.moveDuration }, 0);
-      tl.to(m.rotation, { y: 0, z: home.rotZ, duration: FOCUS.moveDuration }, 0);
+
+      // torna fronte (y=0) e ripristina angolazione (z=home.rotZ)
+      tl.to(m.rotation, { y: 0, z: home.rotZ ?? 0, duration: FOCUS.moveDuration }, 0);
     }
   }, [ref, home, isActive]);
 
@@ -45,8 +76,7 @@ export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive })
     const wasDimmed = prevIsDimmed.current;
     prevIsDimmed.current = isDimmed;
 
-    // 🔑 se non c’è focus attivo e questa card NON è mai stata dimmata,
-    // non deve fare nessun tween (evita di interferire col “return home” della ex-attiva)
+    // se non c’è focus attivo e questa card non è mai stata dimmata, non fare nulla
     if (!isAnyActive && !isDimmed && !wasDimmed) return;
 
     const targetZ = isDimmed ? DIM.z : home.z;
