@@ -12,6 +12,7 @@ export default function Card({
   setSelectedIndex,
   canInteract = true,
   setActiveObject,
+  setPlaysCounter
 }) {
   const ref = useRef();
 
@@ -64,7 +65,14 @@ export default function Card({
     e.stopPropagation();
 
     if (isAnyActive && !isActive) return;
-    setSelectedIndex((cur) => (cur === index ? null : index));
+
+    setSelectedIndex((cur) => {
+      if(cur === index) {
+        setPlaysCounter((prev) => prev += 1);
+        return null;
+      } 
+      else return index;
+    });
   };
 
   const onOver = () => {

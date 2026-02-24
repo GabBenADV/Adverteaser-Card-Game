@@ -1,9 +1,10 @@
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, use, useRef } from "react";
 import Stage from "./components/scene/Stage.jsx";
 import CardGrid from "./components/cards/CardGrid.jsx";
 import FocusPanel from "./components/cards/FocusPanel.jsx";
 import FocusTracker from "./components/scene/FocusTracker.jsx";
 import IntroOverlay from "./components/ui/IntroOverlay.jsx";
+import EndGame from "./components/ui/EndGame.jsx";
 import solutions from "./data/solutions.json";
 
 export default function App() {
@@ -21,11 +22,13 @@ export default function App() {
   
   const open = selectedIndex !== null;
   const item = selectedIndex !== null ? solutions[selectedIndex] : null;
+  const [playsCounter, setPlaysCounter] = useState(0);
 
-  // useEffect(() => {
-  //   const t = setTimeout(() => setLayout("scatter"), 900);
-  //   return () => clearTimeout(t);
-  // }, []);
+  useEffect(() => {
+    if (playsCounter >= 3) {
+      console.log("Hai raggiunto il limite di 3 interazioni. Non puoi più interagire con le carte.");
+    }
+  }, [playsCounter]);
 
   return (
     <div>
@@ -37,6 +40,7 @@ export default function App() {
             layout={layout}
             setActiveObject={setActiveObject}
             canInteract={started}
+            setPlaysCounter={setPlaysCounter}
           />
           <FocusTracker
             enabled={open}
@@ -48,9 +52,12 @@ export default function App() {
       <FocusPanel open={open} item={item} selectedIndex={selectedIndex} pos={panelPos} delay={0.25} />
       {!started && (
         <IntroOverlay
-          buttonText="Gioca con noi"
+          buttonText="gioca con noi."
           onDone={handleIntroDone}
         />
+      )}
+      {playsCounter >= 3 && (
+        <EndGame setPlaysCounter={setPlaysCounter} />
       )}
     </div>
   );

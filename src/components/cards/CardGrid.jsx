@@ -12,6 +12,7 @@ export default function CardGrid({
   canInteract,
   layout,
   setActiveObject,
+  setPlaysCounter,
 }) {
   const count = TEXTURES.count; // es. 32
   const MAX_ANGLE_Z = 0.7; // ~40° (abbassa a 0.35 per ~20°)
@@ -45,6 +46,7 @@ export default function CardGrid({
           setSelectedIndex={setSelectedIndex}
           canInteract={canInteract}
           setActiveObject={setActiveObject}
+          setPlaysCounter={setPlaysCounter}
         />
       ))}
     </>

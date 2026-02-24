@@ -3,10 +3,11 @@ import gsap from "gsap";
 import { DIM, FOCUS, TEXTURES } from "../config/card.config.js";
 
 export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive }) {
-  // Focus + flip (+ shift laterale in delay)
+  
   useEffect(() => {
     const m = ref.current;
     if (!m) return;
+    let playsCounter = 0;
 
     const width = window.innerWidth;
 
@@ -16,14 +17,10 @@ export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive })
       const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
 
       // focus al centro
-      tl.to(m.position, { x: 0, y: 0, z: FOCUS.z, duration: FOCUS.moveDuration }, 0);
+      tl.to( m.position, { x: 0, y: 0, z: FOCUS.z, duration: FOCUS.moveDuration }, 0 );
 
       // zoom
-      tl.to(
-        m.scale,
-        { x: FOCUS.scale, y: FOCUS.scale, z: FOCUS.scale, duration: FOCUS.moveDuration },
-        0
-      );
+      tl.to( m.scale, { x: FOCUS.scale, y: FOCUS.scale, z: FOCUS.scale, duration: FOCUS.moveDuration }, 0 );
 
       // raddrizza angolazione (Z=0) e flippa (Y=PI)
       tl.to(m.rotation, { z: 0, duration: FOCUS.moveDuration }, 0);
@@ -31,26 +28,13 @@ export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive })
 
       // shift “a sinistra / in alto” dopo un attimo (tu lo volevi in delay)
       const shiftAt = Math.max(0, FOCUS.moveDuration - 0.1);
-      tl.to(
-        m.position,
-        {
-          x: width < 1024 ? 0 : -1.8,
-          y: width < 1024 ? 1.2 : 0,
-          duration: 0.5,
-          ease: "power2.in",
-        },
-        shiftAt
-      );
+      tl.to( m.position, { x: width < 1024 ? 0 : -1.8, y: width < 1024 ? 1.2 : 0, duration: 0.5, ease: "power2.in" }, shiftAt );
     } else {
       const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
 
       // torna alla home (posizione + profondità)
       // NB: qui mantengo il tuo offset z “spessore mazzo”
-      tl.to(
-        m.position,
-        { x: home.x, y: home.y, z: home.z + 0.002 * TEXTURES.count, duration: 1.5 },
-        0
-      );
+        tl.to( m.position, { x: home.x, y: home.y, z: home.z + 0.002 * TEXTURES.count, duration: 1.5 }, 0 );
 
       // torna a scala normale
       tl.to(m.scale, { x: 1, y: 1, z: 1, duration: FOCUS.moveDuration }, 0);
@@ -82,21 +66,9 @@ export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive })
     const targetZ = isDimmed ? DIM.z : home.z;
     const targetS = isDimmed ? DIM.scale : 1;
 
-    gsap.to(m.position, {
-      z: targetZ,
-      duration: DIM.duration,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
+    gsap.to(m.position, { z: targetZ, duration: DIM.duration, ease: "power2.out", overwrite: "auto"});
+    gsap.to(m.scale, { x: targetS, y: targetS, z: targetS, duration: DIM.duration, ease: "power2.out", overwrite: "auto" });
 
-    gsap.to(m.scale, {
-      x: targetS,
-      y: targetS,
-      z: targetS,
-      duration: DIM.duration,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
   }, [ref, home, isDimmed, isActive, isAnyActive]);
 }
 

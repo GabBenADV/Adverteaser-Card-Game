@@ -12,19 +12,11 @@ export const GRID = {
 const width = window.innerWidth;
 
 function titleFontSize() {
-  // if (width < 576) return 12;
-  // if (width < 768) return 20;
-  // if (width < 1024) return 32;
-  // if (width < 1600) return 48;
-  return '4vw';
+  return '3.8vw';
 }
 
 function solutionFontSize() {
-  // if (width < 576) return 10;
-  // if (width < 768) return 16;
-  // if (width < 1024) return 24;
-  // if (width < 1600) return 32;
-  return '1.7vw';
+  return '1.6vw';
 }
 
 function categoryFontSize() {

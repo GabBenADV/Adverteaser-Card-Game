@@ -1,0 +1,17 @@
+{
+    "name": "utente/mini-embed",
+    "require": {
+        "phpmailer/phpmailer": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utente\\MiniEmbed\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "GabBenADV",
+            "email": "gabriele.benasso@adverteaser.com"
+        }
+    ]
+}
