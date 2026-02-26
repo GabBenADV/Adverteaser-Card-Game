@@ -5,7 +5,7 @@ import { CARD } from "../../config/card.config";
 export default function IntroOverlay({
   onDone,
   buttonText = "Gioca",
-  messageText = "Le <b>opportunità</b> si colgono meglio insieme.<br> Gli <b>imprevisti</b> non si superano con una campagna.<br>\nServono competenze, struttura, regia, allenamento continuo.<br> Serve qualcuno che giochi con te.<br>\n<h2>Scegli una carta.</h2><br> Opportunità o imprevisto, scopri come ADVERTEASER <br> rende possibile gestire entrambe le situazioni.",
+  messageText = `Le <b>opportunità</b> si colgono meglio insieme.<br> Gli <b>imprevisti</b> non si superano con una campagna.<br>\nServono competenze, struttura, regia, allenamento continuo.<br> Serve qualcuno che giochi con te.<br>\n<h2 style="font-size: ${CARD.titleFontSize} !important; color: white">scegli una carta.</h2><br> Opportunità o imprevisto, scopri come ADVERTEASER <br> rende possibile gestire entrambe le situazioni.`,
   countdownFrom = 10,
 }) {
   const wrapRef = useRef(null);
@@ -54,18 +54,17 @@ export default function IntroOverlay({
         pointerEvents: "auto",
       }}
     >
-      <div style={{ textAlign: "center", color: "white" }}>
+      <div style={{ textAlign: "center", color: "white", minWidth: "50vw"  }}>
         <div
           style={{
-            background: "rgba(0,0,0,0.6)",
+            background: "rgba(0,0,0,0.8)",
             marginTop: 16,
             fontSize: 20,
             fontWeight: 600,
-            padding: 24,
+            padding: (window.innerWidth < 1024) ? "12px 0" : "24px 0",
             borderRadius: 12,
             margin: "0 auto 20px",
-            minWidth: "80%",
-            
+            minWidth: "100%",
             height: "100%",
             zIndex: 0,
             display: "flex",
@@ -81,7 +80,7 @@ export default function IntroOverlay({
           ref={btnRef}
           onClick={start}
           style={{
-            padding: (window.innerWidth < 1024) ? "12px 36px" : "24px 72px",
+            padding: (window.innerWidth < 1024) ? "12px 0" : "24px 0",
             borderRadius: 12,
             border: "1px solid #b60d45",
             background: "#b60d45",
@@ -93,6 +92,10 @@ export default function IntroOverlay({
             fontWeight: 900,
             lineHeight: 1,
             position: "relative",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           {buttonText}

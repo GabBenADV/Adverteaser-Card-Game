@@ -7,7 +7,6 @@ export function useCardAnimation({ ref, home, isActive, isDimmed, isAnyActive })
   useEffect(() => {
     const m = ref.current;
     if (!m) return;
-    let playsCounter = 0;
 
     const width = window.innerWidth;
 

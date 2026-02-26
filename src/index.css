@@ -18,6 +18,10 @@ a {
 }
 
 body {
+	margin: 0 auto;
+}
+
+#root {
 	margin: 0;
 	font-family: 'Public Sans', sans-serif;
 	font-optical-sizing: auto;
@@ -30,21 +34,23 @@ h1 {
 	line-height: 1.1;
 }
 
-h2 {
+h2, h3 {
 	line-height: 1;
 	margin: 0;
+	font-weight: 900;
 }
 
 button {
 	border-radius: 8px;
-	border: 1px solid transparent;
+	border: 1px solid white;
 	padding: 0.6em 1.2em;
-	font-size: 1em;
+	font-size: 18px;
 	font-weight: 500;
 	font-family: inherit;
 	background-color: #1a1a1a;
 	cursor: pointer;
 	transition: border-color 0.25s;
+	margin-left: 10px;
 }
 
 .root {
@@ -113,6 +119,14 @@ button {
 	margin-bottom: 20px;
 }
 
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	width: 50%;
+	min-width: 350px;
+}
+
 form input,
 form select {
 	border: 1px solid white;
@@ -148,7 +162,7 @@ form select {
 
 .endgame-contact-form {
 	border-radius: 16px;
-	background-color: #1a1a1a;
+	background-color: #b60d45;
 	padding: 20px;
 	display: flex;
 	flex-direction: column;
@@ -159,21 +173,62 @@ form select {
 	min-width: 50vw;
 }
 
+.endgame-contact-form button {
+	background: none;
+	color: #fff;
+	padding: 4px 8px;
+}
+
 .inputs-container{
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
 	width: 50%;
 	min-width: 350px;
+	margin-top: auto;
 }
 
 button#close{
 	position: absolute;
-	top: 16px;
-	right: 16px;
-	background: none;
+	top: 32px;
+	right: 32px;
+	background: #b60d45;
 	border: none;
 	color: #fff;
 	font-size: 24px;
+	padding: 12px 18px;
 	cursor: pointer;
+}
+
+.success-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.8);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #fff;
+	text-align: center;
+	z-index: 10;
+	padding: 0 32px;
+}
+
+.success-message {
+	background-color: #b60d45;
+	padding: 40px;
+	border-radius: 16px;
+}
+
+.form-error{
+	background-color: white;
+	color: #b60d45;
+	font-weight: 900;
+	font-size: 18px;
+	border: #b60d45 1px solid;
+	padding: 4px 8px;
+	border-radius: 4px;
+	width: fit-content;
 }

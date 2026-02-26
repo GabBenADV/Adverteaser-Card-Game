@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 import { CARD, DIM, FOCUS } from "../../config/card.config.js";
 import { useCardAnimation, hoverIn, hoverOut } from "../../hooks/useCardAnimation.js";
 import { useCardTextures } from "../../hooks/useCardTextures.js";
+import { trackInteraction } from "../../utils/trackInteraction.js";
+import { getSessionId } from "../../utils/sessionId.js";
+import solutions from "../../data/solutions.json";
+import { set } from "react-hook-form";
 
 export default function Card({
   index,
@@ -12,10 +16,13 @@ export default function Card({
   setSelectedIndex,
   canInteract = true,
   setActiveObject,
-  setPlaysCounter
+  setPlaysCounter,
+  setInteractions,
+  interactions
 }) {
   const ref = useRef();
 
+  const sessionId = getSessionId();
   const isActive = selectedIndex === index;
   const isAnyActive = selectedIndex !== null;
   const isDimmed = isAnyActive && !isActive;
@@ -69,25 +76,23 @@ export default function Card({
     setSelectedIndex((cur) => {
       if(cur === index) {
         setPlaysCounter((prev) => prev += 1);
+        trackInteraction({
+          session_id: sessionId, 
+          card_index: index, 
+          step: interactions,
+          device: 'desktop',
+          category: solutions[index].category,
+          card_type: (index % 2 === 0) ? "opportunita" : "imprevisto",
+          completed: 0
+        });
+        setInteractions(0);
         return null;
       } 
-      else return index;
+      else {
+        setInteractions(1);
+        return index
+      };
     });
-  };
-
-  const onOver = () => {
-    if (!canInteract) return;
-    if (isAnyActive && !isActive) return;
-
-    // hover leggero, ma non “rompe” il focus
-    hoverIn(ref, isActive ? FOCUS.z + 0.15 : home.z + 0.15);
-  };
-
-  const onOut = () => {
-    if (!canInteract) return;
-    if (isAnyActive && !isActive) return;
-
-    hoverOut(ref, isActive ? FOCUS.z : home.z);
   };
 
   return (

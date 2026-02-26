@@ -20,6 +20,7 @@ export default function FocusTracker({ target, enabled, onUpdate }) {
 
   useFrame(() => {
     if (!enabled || !target) return;
+    // console.log("tracking focus", target);
 
     // world pos card
     target.getWorldPosition(p);
