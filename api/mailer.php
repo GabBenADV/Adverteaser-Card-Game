@@ -24,11 +24,11 @@ function send_lead_email_phpmailer(string $email, string $category): void
     try {
         $mail->CharSet = 'UTF-8';
         $mail->isSMTP();
-        $mail->Host = 'pro.eu.turbo-smtp.com';
+        $mail->Host = getenv('SMTP_HOST');
         $mail->SMTPAuth = true;
-        $mail->Username = 'caf924c521d1da9ff439';
-        $mail->Password = 'lzVKsZoi08bqJhyx4fU7';
-        $mail->Port = 587;
+        $mail->Username = getenv('SMTP_USER');
+        $mail->Password = getenv('SMTP_PASS');
+        $mail->Port = getenv('SMTP_PORT');
         $mail->SMTPSecure = 'tls';
 
         // Debug SMTP (solo in dev)
