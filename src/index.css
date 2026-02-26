@@ -129,6 +129,8 @@ form {
 
 form input,
 form select {
+	background-color: white;
+	color: #1a1a1a;
 	border: 1px solid white;
 	border-radius: 20px;
 	width: 100%;
