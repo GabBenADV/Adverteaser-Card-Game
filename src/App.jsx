@@ -71,11 +71,11 @@ export default function App() {
                 setInteractions={setInteractions}
                 interactions={interactions}
               />
-              <FocusTracker
+              {/* <FocusTracker
                 enabled={open}
                 target={activeObject}
                 onUpdate={setPanelPos}
-              />
+              /> */}
             </Suspense>
           </Stage>
           <FocusPanel

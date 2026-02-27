@@ -28,11 +28,7 @@ function categoryFontSize() {
 }
 
 function ctaFontSize() {
-  if (width < 576) return 10;
-  if (width < 768) return 12;
-  if (width < 1024) return 14;
-  if (width < 1600) return 16;
-  return 18;
+  return '1.8vw'
 }
 
 function sizeX() {

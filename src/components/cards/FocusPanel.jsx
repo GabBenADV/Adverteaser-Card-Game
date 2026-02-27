@@ -26,7 +26,7 @@ export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.2
 
         if (open) {
             setTimeout(() => {
-                gsap.to(el, { autoAlpha: 1, y: "-=10", left: "+=60", duration: 1, ease: "power2.out" });
+                gsap.to(el, { autoAlpha: 1, right: 0, duration: 1, ease: "power2.out" });
             }, 1000);
         } else {
             gsap.to(el, { autoAlpha: 0, duration: 0.2, ease: "power2.out", onComplete: () => setMounted(false), });
@@ -38,14 +38,14 @@ export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.2
     return (
         <div className="card-container" ref={elRef}
             style={{
-                position: "absolute", left: pos?.x ?? 0, top: pos?.y ?? 0, transform: "translateY(-50%)", width: (width < 1024) ? "80vw" : "30vw",
-                padding: (isRetina) ? 64 : 32, background: backgroundColor, border: `2px solid ${borderColor}`, color: "#b3b3b3", opacity: 0, borderRadius: 16,
+                position: "absolute", right: "-100%", top: '10vh', width: '40vw', height: `calc(80vh - ${isRetina ? 256 : 128}px)`,
+                padding: (isRetina) ? '128px 64px' : '64px 32px', background: backgroundColor, color: "#b3b3b3", opacity: 0, display: "flex", flexDirection: "column", justifyContent: "space-between",
             }}>
-            <div ref={cardRef}>
-                <div className="card-title" style={{ fontSize: CARD.titleFontSize, marginBottom: (isRetina) ? 60 : 30 }}>{item.title}</div>
-                <div className="card-category" style={{ fontSize: CARD.categoryFontSize }}>{item.category}</div>
+            <div className="card-content" ref={cardRef} style={{ gap: (isRetina) ? 72 : 36 }} >
+                <div className="card-title" style={{ fontSize: CARD.titleFontSize, gap: (isRetina) ? 60 : 30 }}>{item.cta}</div>
+                {/* <div className="card-category" style={{ fontSize: CARD.categoryFontSize }}>{item.category}</div> */}
                 <div className="card-solution" style={{ fontSize: CARD.solutionFontSize }}>{item.solution}</div>
-                {item.cta ? (<div className="card-cta" style={{ fontSize: CARD.ctaFontSize, background: backgroundColor }} onClick={handleCTA}>{item.cta}</div>) : null}
+                {item.cta ? (<div className="card-cta" style={{ fontSize: CARD.categoryFontSize }} onClick={handleCTA}>Clicca qui</div>) : null}
             </div>
             <div className="game-contact-form-container" ref={formRef} >
                 <form className="game-contact-form" action="" onSubmit={onSubmit} >

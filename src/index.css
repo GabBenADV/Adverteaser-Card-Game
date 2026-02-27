@@ -57,10 +57,18 @@ button {
 	width: 100%;
 }
 
+.card-content {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 100%;
+	color: #c2c2c2;
+}
+
 .card-title {
 	font-weight: 900;
 	text-align: center;
-	text-transform: lowercase;
+	/* text-transform: lowercase; */
 	line-height: 1;
 }
 
@@ -83,16 +91,17 @@ button {
 }
 
 .card-cta {
+	background-color: transparent;
 	margin-top: 20px;
-	font-weight: 600;
-	opacity: 0.95;
+	font-weight: 400;
 	text-transform: uppercase;
 	text-align: center;
 	border: 2px solid #b3b3b3;
-	color: #b3b3b3;
+	border-left: 0;
+	border-right: 0;
 	padding: 8px 16px;
-	border-radius: 24px;
 	cursor: pointer;
+	letter-spacing: -0.1px;
 }
 
 .game-contact-form-container {

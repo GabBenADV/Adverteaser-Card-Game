@@ -79,8 +79,8 @@ export default function SwiperComponent({ setSuccess, setInteractions, interacti
                 style={{ backgroundColor: index % 2 === 0 ? "#b60d45" : "#1a1a1a" }}
                 className="face face--2 solution"
               >
-                <div className="solution-title">{solutions[index].title}</div>
-                <div className="solution-category">{solutions[index].category}</div>
+                <div className="solution-title">{solutions[index].cta}</div>
+                {/* <div className="solution-category">{solutions[index].category}</div> */}
                 <div className="solution-description">{solutions[index].solution}</div>
               </div>
 
@@ -102,7 +102,7 @@ export default function SwiperComponent({ setSuccess, setInteractions, interacti
               style={{ backgroundColor: index % 2 === 0 ? "#b60d45" : "#1a1a1a" }}
             >
               <div className="solution-cta" onClick={() => openForm(index)}>
-                {solutions[index].cta}
+                Clicca qui
               </div>
             </div>
 
