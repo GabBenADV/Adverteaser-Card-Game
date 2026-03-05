@@ -7,8 +7,8 @@ export default function Stage({ children, controlsEnabled }) {
       <Canvas
         shadows
         camera={{ position: [0, 0, 9], fov: 45 }}
-        dpr={1}
-        gl={{ antialias: false, powerPreference: "high-performance" }}
+        dpr={[ 1, 2 ]}
+        gl={{ antialias: true, powerPreference: "high-performance" }}
       >
         <ambientLight intensity={0.35} />
         <directionalLight castShadow

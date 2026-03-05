@@ -85,7 +85,7 @@ export default function SwiperComponent({ setSuccess, setInteractions, interacti
               </div>
 
               <img
-                src={`/dist/cards/front_${pad2(index)}.webp`}
+                src={`/dist/cards/front_${pad2(index)}.png`}
                 alt=""
                 className="face face--1"
               />

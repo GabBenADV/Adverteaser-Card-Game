@@ -38,7 +38,7 @@ export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.2
     return (
         <div className="card-container" ref={elRef}
             style={{
-                position: "absolute", right: "-100%", top: '10vh', width: '40vw', height: `calc(80vh - ${isRetina ? 256 : 128}px)`,
+                position: "absolute", right: "-100%", top: '10vh', width: '40vw', height: `80vh`,
                 padding: (isRetina) ? '128px 64px' : '64px 32px', background: backgroundColor, color: "#b3b3b3", opacity: 0, display: "flex", flexDirection: "column", justifyContent: "space-between",
             }}>
             <div className="card-content" ref={cardRef} style={{ gap: (isRetina) ? 72 : 36 }} >

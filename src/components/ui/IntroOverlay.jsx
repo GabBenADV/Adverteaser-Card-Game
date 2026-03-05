@@ -5,7 +5,7 @@ import { CARD } from "../../config/card.config";
 export default function IntroOverlay({
   onDone,
   buttonText = "Gioca",
-  messageText = `Le <b>opportunità</b> si colgono meglio insieme.<br> Gli <b>imprevisti</b> non si superano con una campagna.<br>\nServono competenze, struttura, regia, allenamento continuo.<br> Serve qualcuno che giochi con te.<br>\n<h2 style="font-size: ${CARD.titleFontSize} !important; color: white">scegli una carta.</h2><br> Opportunità o imprevisto, scopri come ADVERTEASER <br> rende possibile gestire entrambe le situazioni.`,
+  messageText = `Le <b>opportunità</b> si colgono meglio insieme.<br> Gli <b>imprevisti</b> non si superano con una campagna.<br>\nServono competenze, struttura, regia, allenamento continuo.<br> Serve qualcuno che giochi con te.<br>\n<h2 style="font-size: ${(window.innerWidth < 1024) ? "36px" : CARD.titleFontSize} !important; color: white">scegli una carta.</h2><br> Opportunità o imprevisto, scopri come ADVERTEASER <br> rende possibile gestire entrambe le situazioni.`,
   countdownFrom = 10,
 }) {
   const wrapRef = useRef(null);
@@ -61,10 +61,10 @@ export default function IntroOverlay({
             marginTop: 16,
             fontSize: 20,
             fontWeight: 600,
-            padding: (window.innerWidth < 1024) ? "12px 0" : "24px 0",
+            padding: (window.innerWidth < 1024) ? "12px" : "24px 0",
             borderRadius: 12,
             margin: "0 auto 20px",
-            minWidth: "100%",
+            width: (window.innerWidth < 1024) ? "80%" : "100%",
             height: "100%",
             zIndex: 0,
             display: "flex",
@@ -76,7 +76,7 @@ export default function IntroOverlay({
             <span dangerouslySetInnerHTML={{ __html: messageText }} />
           </div>
         </div>
-        <button
+        <a
           ref={btnRef}
           onClick={start}
           style={{
@@ -85,21 +85,22 @@ export default function IntroOverlay({
             border: "1px solid #b60d45",
             background: "#b60d45",
             color: "white",
-            fontSize: CARD.titleFontSize,
+            fontSize: (window.innerWidth < 1024) ? "36px" : CARD.titleFontSize,
             cursor: "pointer",
             animation: "pulse 1.5s ease-in-out infinite",
             zIndex: 1,
             fontWeight: 900,
             lineHeight: 1,
             position: "relative",
-            width: "100%",
+            width: (window.innerWidth < 1024) ? "calc(80% + 24px)" : "100%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            margin: "0 auto",
           }}
         >
           {buttonText}
-        </button>
+        </a>
 
         
       </div>

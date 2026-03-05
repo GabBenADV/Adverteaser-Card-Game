@@ -12,7 +12,7 @@ export const GRID = {
 const width = window.innerWidth;
 
 function titleFontSize() {
-  return '3.8vw';
+  return 'clamp(1.5rem, 3.8vw, 65px)';
 }
 
 function solutionFontSize() {

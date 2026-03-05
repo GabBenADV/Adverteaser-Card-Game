@@ -91,16 +91,16 @@ export default function App() {
             setInteractions={setInteractions}
             interactions={interactions}
           />
-          {!started && (
-            <IntroOverlay
-              buttonText="gioca con noi."
-              onDone={handleIntroDone}
-            />
-          )}
           {playsCounter >= 3 && (
             <EndGame setPlaysCounter={setPlaysCounter} setSuccess={setSuccess} />
           )}
         </>
+      )}
+      {!started && (
+        <IntroOverlay
+          buttonText="gioca con noi."
+          onDone={handleIntroDone}
+        />
       )}
       {success && (
         <div className="success-container">
