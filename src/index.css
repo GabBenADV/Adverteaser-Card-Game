@@ -242,3 +242,59 @@ button#close{
 	border-radius: 4px;
 	width: fit-content;
 }
+
+.recaptcha-field {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	min-height: 78px;
+}
+
+.recaptcha-error {
+	background-color: white;
+	color: #b60d45;
+	font-size: 14px;
+	font-weight: 700;
+	margin-top: 6px;
+	padding: 4px 8px;
+	border-radius: 4px;
+}
+
+.endgame-category{
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 20px;
+	padding: 24px;
+	width: 80%;
+}
+
+.checkbox-container {
+	align-items: center;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 8px;
+}
+
+.checkbox-container label{
+	position: relative;
+	color: white;
+	pointer-events: all;
+	left: unset;
+	top: unset;
+	transform: none;
+}
+
+.endgame-contact-form input[type="checkbox"] {
+	appearance: none;
+	width: 15px;
+	height: 15px;
+	padding: 0;
+	border-radius: 0;
+}
+
+input[type="checkbox"]:checked {
+	background: url('assets/checked.svg') no-repeat center center;
+	background-size: contain;
+	background-color: white;
+}

@@ -1,8 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import solutions from "../../data/solutions.json";
 import useSwiper from "../../hooks/useSwiper";
 import useMobileForm from "../../hooks/useMobileForm";
+import { isRecaptchaEnabled } from "../../config/recaptcha.config";
+import Recaptcha from "../ui/Recaptcha";
 
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -18,7 +20,14 @@ export default function SwiperComponent({ setSuccess, setInteractions, interacti
   const { activeIndex, onSwiper, onSlideChange, handleFaceChange, openForm, closeForm } =
     useSwiper(setFace, face, solutions, setInteractions, interactions);
 
-  const { register, onSubmit, isSubmitting } = useMobileForm(
+  const {
+    register,
+    onSubmit,
+    isSubmitting,
+    setRecaptchaToken,
+    recaptchaResetKey,
+    recaptchaRules,
+  } = useMobileForm(
     activeIndex,
     solutions[activeIndex],
     setError,
@@ -90,7 +99,7 @@ export default function SwiperComponent({ setSuccess, setInteractions, interacti
                 className="face face--1"
               />
               <img
-                src={`/dist/cards/back_${pad2(index)}.webp`}
+                src={`/dist/cards/back_${pad2(index)}.png`}
                 alt=""
                 className="face face--0"
               />
@@ -134,6 +143,16 @@ export default function SwiperComponent({ setSuccess, setInteractions, interacti
                     },
                   })}
                 />
+
+                {isRecaptchaEnabled && (
+                  <>
+                    <input type="hidden" {...register("recaptchaToken", recaptchaRules)} />
+                    <Recaptcha
+                      onVerify={setRecaptchaToken}
+                      resetKey={recaptchaResetKey}
+                    />
+                  </>
+                )}
 
                 {error && <div className="mobile-form-error">{error}</div>}
 

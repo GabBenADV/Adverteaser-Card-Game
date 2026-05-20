@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { trackInteraction } from "../utils/trackInteraction";
 import { getSessionId } from "../utils/sessionId";
+import { isRecaptchaEnabled } from "../config/recaptcha.config";
 
 export default function useMobileForm(activeIndex,item, setError, onSuccess, setInteractions, setFace, setSuccess) {
   const defaultCategory = item?.category ?? "";
@@ -17,18 +18,28 @@ export default function useMobileForm(activeIndex,item, setError, onSuccess, set
       category: defaultCategory,
       name: "",
       email: "",
+      recaptchaToken: "",
     },
     mode: "onSubmit",
     reValidateMode: "onChange",
     shouldUnregister: false,
   });
+  const [recaptchaResetKey, setRecaptchaResetKey] = useState(0);
 
   // Quando cambia slide (item), aggiorna category e resetta name/email
   useEffect(() => {
     const cat = item?.category ?? "";
     setValue("category", cat);
-    reset({ category: cat, name: "", email: "" });
+    reset({ category: cat, name: "", email: "", recaptchaToken: "" });
+    setRecaptchaResetKey((key) => key + 1);
   }, [item?.category, reset, setValue]);
+
+  const setRecaptchaToken = useCallback((token) => {
+    setValue("recaptchaToken", token, {
+      shouldDirty: Boolean(token),
+      shouldValidate: Boolean(token),
+    });
+  }, [setValue]);
 
   const onValid = async (values) => {
     setError?.(null);
@@ -42,7 +53,7 @@ export default function useMobileForm(activeIndex,item, setError, onSuccess, set
 
       const raw = await res.text();
       let data = null;
-      try { data = JSON.parse(raw); } catch {}
+      try { data = JSON.parse(raw); } catch { data = null; }
 
       if (!res.ok) throw new Error(data?.error || raw || `HTTP ${res.status}`);
 
@@ -60,7 +71,8 @@ export default function useMobileForm(activeIndex,item, setError, onSuccess, set
       });
 
       // reset mantenendo la category
-      reset({ category: values.category, name: "", email: "" });
+      reset({ category: values.category, name: "", email: "", recaptchaToken: "" });
+      setRecaptchaResetKey((key) => key + 1);
       onSuccess?.(() => {
         setFace(0);
         setSuccess(true);
@@ -78,11 +90,23 @@ export default function useMobileForm(activeIndex,item, setError, onSuccess, set
       errs?.name?.message ||
       errs?.email?.message ||
       errs?.category?.message ||
+      errs?.recaptchaToken?.message ||
       "Dati non validi";
     setError?.(msg);
   };
 
-  const onSubmit = useMemo(() => handleSubmit(onValid, onInvalid), [handleSubmit, item?.category]);
+  const onSubmit = handleSubmit(onValid, onInvalid);
 
-  return { register, onSubmit, isSubmitting };
+  const recaptchaRules = isRecaptchaEnabled
+    ? { required: "Conferma il reCAPTCHA" }
+    : undefined;
+
+  return {
+    register,
+    onSubmit,
+    isSubmitting,
+    setRecaptchaToken,
+    recaptchaResetKey,
+    recaptchaRules,
+  };
 }

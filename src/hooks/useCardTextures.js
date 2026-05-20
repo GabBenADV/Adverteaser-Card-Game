@@ -10,7 +10,7 @@ function pad2(n) {
 export function useCardTextures(index) {
   const frontUrl = useMemo(
     () => {
-        return `/dist/${TEXTURES.dir}/back_${pad2(index)}.${TEXTURES.ext}`;
+        return `/dist/${TEXTURES.dir}/back_${pad2(index)}.png`;
     },
     [index]
   );

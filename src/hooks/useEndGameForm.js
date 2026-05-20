@@ -1,13 +1,12 @@
-import { useMemo, useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { isRecaptchaEnabled } from "../config/recaptcha.config";
 
 export default function useEndGameForm(
   setSteps,
   steps,
   setPlaysCounter,
   setSuccess,
-  setActiveObject,
-  setSelectedIndex,
 ) {
 
   const [submitError, setSubmitError] = useState(null);
@@ -17,6 +16,7 @@ export default function useEndGameForm(
     handleSubmit,
     trigger,
     clearErrors,
+    setValue,
     formState: { errors, isSubmitting },
     reset,
   } = useForm({
@@ -24,11 +24,13 @@ export default function useEndGameForm(
       category: "",
       name: "",
       email: "",
+      recaptchaToken: "",
     },
     mode: "onSubmit",
     reValidateMode: "onChange",
     // shouldUnregister: true,
   });
+  const [recaptchaResetKey, setRecaptchaResetKey] = useState(0);
 
   useEffect(() => {
     setSubmitError(null);
@@ -39,10 +41,18 @@ export default function useEndGameForm(
   const categoryErr = errors?.category?.message ?? null;
   const nameErr = errors?.name?.message ?? null;
   const emailErr = errors?.email?.message ?? null;
+  const recaptchaErr = errors?.recaptchaToken?.message ?? null;
 
   const formError =
     submitError ||
-    (steps === 0 ? categoryErr : (nameErr || emailErr));
+    (steps === 0 ? categoryErr : (nameErr || emailErr || recaptchaErr));
+
+  const setRecaptchaToken = useCallback((token) => {
+    setValue("recaptchaToken", token, {
+      shouldDirty: Boolean(token),
+      shouldValidate: Boolean(token),
+    });
+  }, [setValue]);
 
   async function nextStep(e) {
     e.preventDefault();
@@ -72,7 +82,7 @@ export default function useEndGameForm(
 
       const raw = await res.text();
       let data = null;
-      try { data = JSON.parse(raw); } catch {}
+      try { data = JSON.parse(raw); } catch { data = null; }
 
       if (!res.ok) {
         throw new Error(data?.error || raw || `HTTP ${res.status}`);
@@ -90,7 +100,8 @@ export default function useEndGameForm(
       // setSelectedIndex?.(null);
 
       // reset mantenendo la categoria selezionata (opzionale)
-      reset({ category: values.category, name: "", email: "" });
+      reset({ category: values.category, name: "", email: "", recaptchaToken: "" });
+      setRecaptchaResetKey((key) => key + 1);
     } catch (err) {
       console.error("Fetch leads.php failed:", err);
       setSubmitError(err?.message || "Errore invio");
@@ -98,15 +109,26 @@ export default function useEndGameForm(
   };
 
   // handler RHF pronto per <form onSubmit=...> oppure onClick
-  const onSubmit = useMemo(
-    () =>
-      handleSubmit(onValidSubmit),
-    [handleSubmit]
-  );
+  const onSubmit = handleSubmit(onValidSubmit);
 
   function close() {
     setPlaysCounter(0);
   }
 
-  return { register, nextStep, prevStep, onSubmit, close, formError, isSubmitting };
+  const recaptchaRules = isRecaptchaEnabled
+    ? { required: "Conferma il reCAPTCHA" }
+    : undefined;
+
+  return {
+    register,
+    nextStep,
+    prevStep,
+    onSubmit,
+    close,
+    formError,
+    isSubmitting,
+    setRecaptchaToken,
+    recaptchaResetKey,
+    recaptchaRules,
+  };
 }

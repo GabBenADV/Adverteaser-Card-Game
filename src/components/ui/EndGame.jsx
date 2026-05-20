@@ -1,6 +1,8 @@
 import { useState } from "react";
 import categories from "../../data/categories.json";
 import useEndGameForm from "../../hooks/useEndGameForm";
+import { isRecaptchaEnabled } from "../../config/recaptcha.config";
+import Recaptcha from "./Recaptcha";
 
 export default function EndGame({ setPlaysCounter, setSuccess }) {
 
@@ -13,6 +15,9 @@ export default function EndGame({ setPlaysCounter, setSuccess }) {
     close,
     formError,
     isSubmitting,
+    setRecaptchaToken,
+    recaptchaResetKey,
+    recaptchaRules,
   } = useEndGameForm(setSteps, steps, setPlaysCounter, setSuccess);
   
   return (
@@ -30,7 +35,7 @@ export default function EndGame({ setPlaysCounter, setSuccess }) {
         {steps > 0 && (<h3 style={{color: "white"}}>Raccontaci chi sei</h3>)}
         {steps === 0 && (
           <div className="inputs-container endgame-category">
-            <select
+            {/* <select
               id="category"
               {...register("category", { required: "Scegli un ambito" })}
             >
@@ -38,7 +43,13 @@ export default function EndGame({ setPlaysCounter, setSuccess }) {
               {categories.map((c, i) => (
                 <option key={i} value={c.value}>{c.value}</option>
               ))}
-            </select>
+            </select> */}
+            {categories.map((c, i) => (
+              <div key={i} className="checkbox-container">
+                <input key={i} type="checkbox" id={c.value} value={c.value} {...register("category", { required: "Scegli un ambito" })} />
+                <label htmlFor={c.value}>{c.value}</label> 
+              </div>
+            ))}
           </div>
         )}
         {steps > 0 && (
@@ -52,6 +63,15 @@ export default function EndGame({ setPlaysCounter, setSuccess }) {
                   message: "Email non valida" 
                 } 
               })} />
+            {isRecaptchaEnabled && (
+              <>
+                <input type="hidden" {...register("recaptchaToken", recaptchaRules)} />
+                <Recaptcha
+                  onVerify={setRecaptchaToken}
+                  resetKey={recaptchaResetKey}
+                />
+              </>
+            )}
           </div>
         )}
         {formError && <div className="form-error">{formError}</div>}

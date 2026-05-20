@@ -128,6 +128,12 @@
   width: 80%;
 }
 
+.mobile-form .recaptcha-field {
+  transform: scale(0.86);
+  transform-origin: center top;
+  min-height: 70px;
+}
+
 .solution-title {
   font-size: 5vw;
   line-height: 1;

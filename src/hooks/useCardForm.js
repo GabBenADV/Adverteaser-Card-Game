@@ -1,8 +1,9 @@
 import gsap from "gsap";
-import { useMemo, useEffect } from "react";
-import { set, useForm } from "react-hook-form";
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { trackInteraction } from "../utils/trackInteraction";
 import { getSessionId } from "../utils/sessionId";
+import { isRecaptchaEnabled } from "../config/recaptcha.config";
 
 export default function useCardForm( formRef, cardRef, item, setSuccess, setPlaysCounter, setError, setInteractions, interactions, selectedIndex) {
 
@@ -12,14 +13,24 @@ export default function useCardForm( formRef, cardRef, item, setSuccess, setPlay
         category: defaultCategory,
         name: "",
         email: "",
+        recaptchaToken: "",
       },
       mode: "onSubmit",
     });
+    const [recaptchaResetKey, setRecaptchaResetKey] = useState(0);
 
     useEffect(() => {
       setValue("category", item?.category ?? "");
-      reset({ category: item?.category ?? "", name: "", email: "" });
-    }, [item?.category, setValue]);
+      reset({ category: item?.category ?? "", name: "", email: "", recaptchaToken: "" });
+      setRecaptchaResetKey((key) => key + 1);
+    }, [item?.category, reset, setValue]);
+
+    const setRecaptchaToken = useCallback((token) => {
+      setValue("recaptchaToken", token, {
+        shouldDirty: Boolean(token),
+        shouldValidate: Boolean(token),
+      });
+    }, [setValue]);
 
     const onValid = async (values) => {
       setError?.(null);
@@ -33,11 +44,13 @@ export default function useCardForm( formRef, cardRef, item, setSuccess, setPlay
         });
 
         const raw = await res.text();
+        console.log("status:", res.status);
+        console.log("raw:", raw);
+
         let data = null;
+        try { data = JSON.parse(raw); } catch { data = null; }
 
-        try { data = JSON.parse(raw) } catch { console.error("Failed to parse JSON:", raw); }
-
-        if (!res.ok) { throw new Error(data?.error || raw || `HTTP ${res.status}`) }
+        if (!res.ok) throw new Error(data?.error || raw || `HTTP ${res.status}`);
 
         const ok = data?.ok === true || data?.success === true;
 
@@ -57,7 +70,8 @@ export default function useCardForm( formRef, cardRef, item, setSuccess, setPlay
         });
 
         // reset form (mantieni category)
-        reset({ category: values.category, name: "", email: "" });
+        reset({ category: values.category, name: "", email: "", recaptchaToken: "" });
+        setRecaptchaResetKey((key) => key + 1);
         setInteractions(0)
 
       } catch (err) {
@@ -68,18 +82,16 @@ export default function useCardForm( formRef, cardRef, item, setSuccess, setPlay
 
     const onInvalid = (errs) => {
       const msg =
-		    errs?.name?.message ||
+        errs?.name?.message ||
         errs?.email?.message ||
         errs?.category?.message ||
+        errs?.recaptchaToken?.message ||
         "Dati non validi";
       setError?.(msg);
     };
 
     // handler pronto da attaccare al form
-    const onSubmit = useMemo(
-      () => handleSubmit(onValid, onInvalid),
-      [handleSubmit, item?.category],
-    );
+    const onSubmit = handleSubmit(onValid, onInvalid);
 
   function handleCTA() {
     
@@ -95,5 +107,17 @@ export default function useCardForm( formRef, cardRef, item, setSuccess, setPlay
     }
   }
 
-  return { register, onSubmit, isSubmitting, handleCTA };
+  const recaptchaRules = isRecaptchaEnabled
+    ? { required: "Conferma il reCAPTCHA" }
+    : undefined;
+
+  return {
+    register,
+    onSubmit,
+    isSubmitting,
+    handleCTA,
+    setRecaptchaToken,
+    recaptchaResetKey,
+    recaptchaRules,
+  };
 }

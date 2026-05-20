@@ -1,22 +1,32 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { CARD, isRetina } from "../../config/card.config";
 import useCardForm from '../../hooks/useCardForm';
+import { isRecaptchaEnabled } from "../../config/recaptcha.config";
+import Recaptcha from "../ui/Recaptcha";
 
-export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.25, setSuccess, setPlaysCounter, setInteractions, interactions }) {
+export default function FocusPanel({ open, item, selectedIndex, delay = 0.25, setSuccess, setPlaysCounter, setInteractions, interactions }) {
     const elRef = useRef(null);
     const [mounted, setMounted] = useState(open);
     const backgroundColor = (selectedIndex % 2 !== 0) ? "rgba(0,0,0,0.8)" : "rgba(84, 1, 12, 0.8)";
-    const borderColor = (selectedIndex % 2 !== 0) ? "#000" : "#b60d45";
     const formRef = useRef(null);
     const cardRef = useRef(null);
     const [error, setError] = useState(null);
-    const { register, onSubmit, isSubmitting, handleCTA } = useCardForm(formRef, cardRef, item, setSuccess, setPlaysCounter, setError, setInteractions, interactions, selectedIndex);
-
-    const width = window.innerWidth;
+    const {
+        register,
+        onSubmit,
+        isSubmitting,
+        handleCTA,
+        setRecaptchaToken,
+        recaptchaResetKey,
+        recaptchaRules,
+    } = useCardForm(formRef, cardRef, item, setSuccess, setPlaysCounter, setError, setInteractions, interactions, selectedIndex);
 
     useEffect(() => {
-        if (open) setMounted(true);
+        if (!open) return;
+
+        const frame = window.requestAnimationFrame(() => setMounted(true));
+        return () => window.cancelAnimationFrame(frame);
     }, [open]);
 
     useEffect(() => {
@@ -60,6 +70,15 @@ export default function FocusPanel({ open, item, selectedIndex, pos, delay = 0.2
                                 message: "Email non valida",
                             },
                         })} />
+                    {isRecaptchaEnabled && (
+                        <>
+                            <input type="hidden" {...register("recaptchaToken", recaptchaRules)} />
+                            <Recaptcha
+                                onVerify={setRecaptchaToken}
+                                resetKey={recaptchaResetKey}
+                            />
+                        </>
+                    )}
                     {error && <div className="form-error">{error}</div>}
                     
                     <button type="submit" className="game-contact-form-submit" disabled={isSubmitting}>

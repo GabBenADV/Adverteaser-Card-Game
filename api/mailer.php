@@ -8,14 +8,14 @@ use PHPMailer\PHPMailer\Exception;
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-function send_lead_email_phpmailer(string $email, string $category): void
+function send_lead_email_phpmailer(string $email, array $categories): void
 {
     $to = 'gabriele.benasso@adverteaser.com';
 
-    $subject = "Nuova richiesta FocusPanel: {$category}";
+    $subject = "Nuova richiesta FocusPanel: " . implode(', ', $categories);
     $body = "Nuova richiesta dal FocusPanel\n\n"
           . "Email: {$email}\n"
-          . "Categoria: {$category}\n"
+          . "Categorie: " . implode(', ', $categories) . "\n"
           . "Data: " . date('c') . "\n"
           . "IP: " . ($_SERVER['REMOTE_ADDR'] ?? '-') . "\n";
 
